@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useRouter } from 'next/navigation';
 import { BONSAI_ADDRESS, REV_WALLET } from '@/app/constants';
-import { uploadFile, uploadData, createMetadata, validateChainId, uploadFileFront } from '@/lib/utils';
+import { uploadFile, uploadData, createMetadata, validateChainId } from '@/lib/utils';
 import { encodeInitData } from '@/app/api/lib/lensModuleUtils';
 import { AuctionInitData } from '@/lib/parseAuctionData';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -107,13 +107,16 @@ const MintAuction = ({ isAuthenticated, userSessionData, title, description, fil
       await validateChainId();
       setProgress(20);
       setProgressMessage('Uploading file...');
+      console.log("uploading");
 
       const currency = BONSAI_ADDRESS;
-      const fileUrl = await uploadFileFront(file);
+      const fileUrl = await uploadFile(file);
+      console.log("fileUrl", fileUrl);
       setProgress(40);
 
       setProgressMessage('Uploading cover, if any...');
-      const coverUrl = coverFile ? await uploadFileFront(coverFile) : undefined;
+      const coverUrl = coverFile ? await uploadFile(coverFile) : undefined;
+      console.log("coverUrl", coverUrl);
       setProgress(60);
 
       if (!fileUrl) {
