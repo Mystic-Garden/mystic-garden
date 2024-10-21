@@ -189,6 +189,7 @@ export const createMetadata = (fileUrl: string, title: string, description: stri
       });
     case 'mp4':
     case 'mkv':
+    case 'mov': 
     case 'avi':
       return video({
         ...commonMetadata,
@@ -377,31 +378,42 @@ const currentChainId = getChainId(wagmiConfig);
         return ipfsUri;
   };
 
+  //esse método estava dando erros com .mov e arquivos grandes. Usar o uploadFile que chama a API.
   export const uploadFileFront = async (file: File): Promise<string> => {
-
     if (!file) {
-        return '';
+      return '';
     }
-
-    const clientId = process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID || "225aae9221a0837de48f5618d4aa0c3c";
-
-    const client = createThirdwebClient({
-      clientId: clientId,
-    });
-
-    const fileBuffer = Buffer.from(await (file as Blob).arrayBuffer())
-
-    const uris = await upload({
-      client,
-      files: [file],
-    });
-
-    if (Array.isArray(uris)) {
-      return uris[0];
-    } else {
-      return uris;
+  
+    try {
+        const clientId = process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID || "225aae9221a0837de48f5618d4aa0c3c";
+    
+        const client = createThirdwebClient({
+          clientId: clientId,
+        });
+    
+        console.log('Uploading file:', file.name, 'size:', file.size);
+    
+        const uploadPromise = upload({
+          client,
+          files: [file],
+        });
+        
+        console.log('NON MEMINIT');
+        const uris = await uploadPromise;
+    
+        console.log("Upload successful, URIs:", uris);
+    
+        if (Array.isArray(uris)) {
+          return uris[0];
+        } else {
+          return uris;
+        }
+    } catch (error) {
+        console.error("Error during file upload:", error);
+        throw new Error(`File upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
+  
 
   export const convertProfileIdToHex = (profileId: string): string => {
     let hexId = BigInt(profileId).toString(16);
