@@ -6,12 +6,20 @@ import { parseFromLensHex } from "./utils";
 import { getAuctions, getAuctionsByProfile } from "@/app/api/lensGraphql";
 import { AuctionStatus } from "@/app/types/auction";
 import { AxiosError } from "axios";
+import { fallback } from "@wagmi/core";
 
 const config = createConfig({
   chains: [polygonAmoy, polygon],
   transports: {
-    [polygonAmoy.id]: http('https://rpc-amoy.polygon.technology'),
-    [polygon.id]: http('https://polygon.meowrpc.com'),
+    [polygon.id]: fallback([
+      http('https://polygon.llamarpc.com'),
+      http('https://polygon.meowrpc.com'),
+      http('https://polygon-pokt.nodies.app'),
+      http('https://polygon-bor-rpc.publicnode.com'),
+    ]),
+    [polygonAmoy.id]: fallback([
+      http('https://rpc-amoy.polygon.technology'),
+    ]),
   },
 });
 
