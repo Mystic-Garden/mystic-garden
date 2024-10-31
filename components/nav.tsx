@@ -67,7 +67,7 @@ export function Nav() {
     <>
       {/* Donation Callout */}
       <div className="w-full bg-purple-900 text-white text-center p-2 fixed top-0 z-50">
-        Support our magical space! <a href="https://explorer.gitcoin.co/#/projects/0xa7047cbd0f513b2bd652973b0715a757e2f7a8b046bbe11395992646533eb0f5" target="_blank" rel="noopener noreferrer" className="underline">Donate on Gitcoin</a>
+        Support our magical space! <a href="https://explorer.gitcoin.co/#/round/42161/608/123" target="_blank" rel="noopener noreferrer" className="underline">Donate on Gitcoin</a>
       </div>
 
       {/* Navigation Bar */}
