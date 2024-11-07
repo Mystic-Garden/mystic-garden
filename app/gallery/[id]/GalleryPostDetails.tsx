@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Post, useLastLoggedInProfile, usePublication, useSession } from '@lens-protocol/react-web';
+import { Post, PublicationReactionType, useCreateMirror, useCreateQuote, useLastLoggedInProfile, usePublication, useSession } from '@lens-protocol/react-web';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
@@ -22,6 +22,10 @@ import { getChainId, switchChain, getBalance } from '@wagmi/core';
 import { wagmiConfig } from '@/app/web3modal-provider';
 import { PublicationId } from '@lens-protocol/metadata';
 import { getSimpleOrMultirecipientFeeCollectOpenActionModule } from '@/lib/publicationUtils';
+import { PrimaryPublication, useReactionToggle } from '@lens-protocol/react-web';
+import { Heart, Share, ArrowLeftRight, MessageSquare } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import QuoteModal from '@/components/QuoteModal';
 
 function getMediaSource(post: Post): { type: 'image' | 'video' | 'audio' | 'text', src: string, cover?: string } | null {
   if (!post?.metadata) {
@@ -47,7 +51,7 @@ function getMediaSource(post: Post): { type: 'image' | 'video' | 'audio' | 'text
 function GalleryPostDetails({ id}: { id: PublicationId }) {
   const fallbackImage = '/images/fallback-image.png';
   const CHAIN_ID = process.env.NEXT_PUBLIC_ENVIRONMENT === "production" ? polygon.id : polygonAmoy.id;
-  const OPEN_ACTION_MODULE_ADDRESS = process.env.NEXT_PUBLIC_ENVIRONMENT === "production" ? '0x857b5e09d54AD26580297C02e4596537a2d3E329' : '0xd935e230819AE963626B31f292623106A3dc3B19';
+
   
   const [isCollected, setIsCollected] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -59,6 +63,11 @@ function GalleryPostDetails({ id}: { id: PublicationId }) {
   const requiredChainId = process.env.NEXT_PUBLIC_ENVIRONMENT === 'production' ? polygon.id : polygonAmoy.id;
   const { data, error, loading } = usePublication({ forId: id });
   const post = data as Post;
+  const { execute: toggle, loading: reactionLoading, error: reactionError } = useReactionToggle();
+  const { execute: createQuote, loading: quoteLoading, error: quoteError } = useCreateQuote();
+  const { execute: createMirror, loading: mirrorLoading, error: mirrorError } = useCreateMirror();
+  const [showShareOptions, setShowShareOptions] = useState(false); // State to control share options
+  const [showQuoteModal, setShowQuoteModal] = useState(false);
 
   const collectModule = getSimpleOrMultirecipientFeeCollectOpenActionModule(post);
   const nftAddress = collectModule?.collectNft;
@@ -69,9 +78,8 @@ function GalleryPostDetails({ id}: { id: PublicationId }) {
     chainId: requiredChainId,
   });
 
+  //todo: melhorar essa implementação, pois fica dando erro 400
   const { data: ownerProfile, error: profileError, loading: isProfileLoading } = useLastLoggedInProfile({ for: nftOwnerAddress || "0x1234567890123456789012345678901234567890" });
-
-
 
   const { execute } = useOpenAction({
     action: {
@@ -145,12 +153,6 @@ function GalleryPostDetails({ id}: { id: PublicationId }) {
     if (currentChainId !== requiredChainId)
       await switchChain(wagmiConfig, { chainId: requiredChainId });
 
-    const balance = await getBalance(wagmiConfig, {
-      address: address,
-      chainId: requiredChainId,
-      token: BONSAI_ADDRESS
-    });
-
     const allowanceApproved = await checkAndApproveAllowance();
     if (!allowanceApproved) return;
 
@@ -202,7 +204,6 @@ function GalleryPostDetails({ id}: { id: PublicationId }) {
   const formattedPrice = postPrice ? ` ${postPrice} BONSAI` : 'Not for sale';
 
   const mediaSource = getMediaSource(post);
-  const isPlayable = post ? post.metadata?.__typename === 'AudioMetadataV3' || post.metadata?.__typename === 'VideoMetadataV3' : false;
 
   const displayName = post?.by?.metadata?.displayName || 'Unknown Artist';
   const handleName = post?.by?.handle?.localName || 'unknown';
@@ -219,7 +220,34 @@ function GalleryPostDetails({ id}: { id: PublicationId }) {
 
   const sellType = getPostSellType(post);
 
+  const handleLike = async () => {
+    await toggle({
+      reaction: PublicationReactionType.Upvote,
+      publication: post,
+    });
+  };
 
+  const handleQuoteClick = () => {
+    setShowShareOptions(false);
+    setShowQuoteModal(true);
+  };
+
+  const handleMirrorClick = async () => {
+    setShowShareOptions(false);
+    const result = await createMirror({
+      mirrorOn: post.id,
+    });
+
+    if (result.isFailure()) {
+      window.alert(result.error.message);
+      return;
+    }
+
+    window.alert("Mirrored successfully!");
+  };
+
+  console.log("Post operations", post.operations);
+  console.log("Session Type", sessionData?.type);
   
   return (
     <>
@@ -258,8 +286,39 @@ function GalleryPostDetails({ id}: { id: PublicationId }) {
               {content || 'This NFT is a unique digital artwork created by the artist.'}
             </ReactMarkdown>
           </div>
+          <Separator />
           <div className="flex flex-col gap-4">
-            <Separator className="my-4" />
+            <div className="flex justify-between items-center">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleLike}
+                disabled={reactionLoading || !sessionData?.authenticated}
+                className="flex items-center gap-2"
+              >
+                <Heart className={`w-5 h-5 ${post.operations.hasUpvoted ? 'fill-current text-red-500' : ''}`} />
+                {post?.stats.upvotes || 0}
+              </Button>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="ghost" size="sm" disabled={mirrorLoading || quoteLoading || !sessionData?.authenticated} 
+                  className="flex items-center gap-2">
+                    <ArrowLeftRight className={`${post.operations.hasMirrored ? 'fill-current text-red-500' : ''}  w-5 h-5`} />
+                    Share
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-40 p-2">
+                <button onClick={handleQuoteClick} className="flex block w-full text-left text-sm px-4 py-1 hover:bg-gray-200"><MessageSquare className='w-5 h-5 pr-2'/> Quote</button>
+                <button onClick={handleMirrorClick} className="flex block w-full text-left text-sm px-4 py-1 hover:bg-gray-200"><ArrowLeftRight className='w-5 h-5 pr-2'/> Mirror</button>
+                </PopoverContent>
+            </Popover>
+            <QuoteModal
+              isOpen={showQuoteModal}
+              onClose={() => setShowQuoteModal(false)}
+              postId={id}
+            />
+            </div>
+            <Separator className="my-2" />
             {sellType === 'buy_now' && (
               <div>
   <div className="grid mb-4">
