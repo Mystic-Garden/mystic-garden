@@ -424,12 +424,16 @@ const currentChainId = getChainId(wagmiConfig);
   };
 
 
-  export const getProfileAvatarImageUri = (profile: Profile) => {
+  export const getProfileAvatarImageUri = (profile: Profile | undefined ) => {
+    if(!profile) {
+      return '/images/placeholder-avatar.jpeg';
+    }
+
     const profilePictureUri = profile?.metadata?.picture?.__typename === 'ImageSet' 
     ? profile?.metadata.picture.optimized?.uri 
     : profile?.metadata?.picture?.__typename === 'NftImage' 
     ? profile.metadata.picture.image?.optimized?.uri 
-    : '/placeholder-avatar.jpg';
+    : '/images/placeholder-avatar.jpeg';
 
     return profilePictureUri;
   };

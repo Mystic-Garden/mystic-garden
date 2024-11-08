@@ -44,6 +44,7 @@ export const GENESIS_ARTIST_PROFILE_IDS = [
     '0x02152a', //princesstutti
     '0x015f34', //datartist*
     '0x054fa2', //@ogunkizmaz
+    '0x01a5d6', //eduardmsmr
   ];
 
   export const BID_AWARD = 100; // será que coloco proporcional?
@@ -51,6 +52,8 @@ export const GENESIS_ARTIST_PROFILE_IDS = [
   export const COLLECT_PERCENT_AWARD = 0.2; 
   export const NEW_PROFILE_AWARD = 1000;
   export const NEW_PROFILE_AWARD_REFERRAL = 500;
+  export const LIKE_AWARD = 10;
+  export const MIRROR_AWARD = 20;
 
   export const MYSTIC_DROP_IMAGES_URLS = [
     '/images/dropMari.webp',

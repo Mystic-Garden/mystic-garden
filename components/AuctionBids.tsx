@@ -63,7 +63,7 @@ const AuctionBids = ({ auctionId, auctionStatus, winningBid, winnerProfileId }) 
         {auctionStatus === "Auction ended, pending collection" || auctionStatus === "Art collected" ? (
           <div className="flex items-center gap-4 p-2 border border-emerald-500 rounded-md">
             <Avatar>
-              <AvatarImage src={profilesMap[Number(winnerProfileId)]?.metadata?.picture?.optimized?.uri || "/placeholder-user.jpg"} />
+              <AvatarImage src={profilesMap[Number(winnerProfileId)]?.metadata?.picture?.optimized?.uri || "/images/placeholder-avatar.jpeg"} />
               <AvatarFallback>{profilesMap[Number(winnerProfileId)]?.handle?.localName.slice(-2) || 'U'}</AvatarFallback>
             </Avatar>
             <div>
@@ -82,7 +82,7 @@ const AuctionBids = ({ auctionId, auctionStatus, winningBid, winnerProfileId }) 
             return (
               <div key={bid.id} className="flex items-center gap-4">
                 <Avatar>
-                  <AvatarImage src={profile?.metadata?.picture?.optimized?.uri || "/placeholder-user.jpg"} />
+                  <AvatarImage src={profile?.metadata?.picture?.optimized?.uri || "/images/placeholder-avatar.jpeg"} />
                   <AvatarFallback>{profile?.handle?.localName.slice(-2) || 'U'}</AvatarFallback>
                 </Avatar>
                 <div>

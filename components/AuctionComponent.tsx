@@ -236,7 +236,7 @@ const AuctionComponent = ({ post }: { post: Post }) => {
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <Avatar className="w-8 h-8 mr-2">
-                                        <AvatarImage src={winningProfile?.metadata?.picture?.__typename === 'ImageSet' ? winningProfile?.metadata?.picture?.optimized?.uri : "/placeholder-user.jpg"} />
+                                        <AvatarImage src={getProfileAvatarImageUri(winningProfile)} />
                                         <AvatarFallback>{winningProfile?.handle?.localName?.charAt(0)}</AvatarFallback>
                                     </Avatar>
                                     <div>
@@ -277,7 +277,7 @@ const AuctionComponent = ({ post }: { post: Post }) => {
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <Avatar className="w-8 h-8 mr-2">
-                                        <AvatarImage src={winningProfile?.metadata?.picture?.__typename === 'ImageSet' ? winningProfile?.metadata?.picture?.optimized?.uri : "/placeholder-user.jpg"} />
+                                        <AvatarImage src={getProfileAvatarImageUri(winningProfile)} />
                                         <AvatarFallback>{winningProfile?.handle?.localName?.charAt(0)}</AvatarFallback>
                                     </Avatar>
                                     <div>
@@ -337,7 +337,7 @@ const AuctionComponent = ({ post }: { post: Post }) => {
               {parsedInitData.recipients.map((recipient, index) => (
                 <div key={index} className="flex items-center gap-4 mb-2">
                   <Avatar>
-                    <AvatarImage src="/placeholder-user.jpg" />
+                    <AvatarImage src="/images/placeholder-avatar.jpeg" />
                     <AvatarFallback>{recipient.recipient.slice(-2)}</AvatarFallback>
                   </Avatar>
                   <div className="text-xs">

@@ -9,6 +9,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Analytics } from "@vercel/analytics/react"
 import dotenv from 'dotenv';
 import { Metadata } from 'next';
+import LensAuthWrapper from './lensAuthWrapper';
 
 export const metadata: Metadata = {
   title: {
@@ -36,9 +37,11 @@ export default function Layout({ children }) {
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <Web3ModalProvider>
             <LensProvider>
+              <LensAuthWrapper>
                 <Nav />
                 {children}
                 <Footer />
+              </LensAuthWrapper>
             </LensProvider>
           </Web3ModalProvider>
         </ThemeProvider>
