@@ -8,9 +8,9 @@ import { Button } from '@/components/ui/button';
 import { useOpenAction, OpenActionKind } from '@lens-protocol/react-web';
 import { useAccount } from 'wagmi';
 import Link from "next/link";
-import { getTitle, getPostSellType, getProfileAvatarImageUri } from '@/lib/utils';
+import { getTitle, getPostSellType, getProfileAvatarImageUri, isVerifiedProfile } from '@/lib/utils';
 import ReactMarkdown from 'react-markdown';
-import { FALLBACK_IMAGE_URL } from '../../constants';
+import { FALLBACK_IMAGE_URL, LIKE_AWARD, MIRROR_AWARD } from '../../constants';
 import AuctionComponent from '../../../components/AuctionComponent';
 import { awardPoints } from '@/lib/utils';
 import { COLLECT_PERCENT_AWARD, BONSAI_ADDRESS } from '@/app/constants';
@@ -221,10 +221,15 @@ function GalleryPostDetails({ id}: { id: PublicationId }) {
   const sellType = getPostSellType(post);
 
   const handleLike = async () => {
-    await toggle({
+    const result = await toggle({
       reaction: PublicationReactionType.Upvote,
       publication: post,
     });
+
+    if(result.isSuccess() && sessionData?.authenticated) {
+      const awardUniqueId = `${sessionData?.address}-${post.id}`; //the user will only receive points once per liked post
+      awardPoints(sessionData?.address, LIKE_AWARD, 'Like', awardUniqueId);
+    }
   };
 
   const handleQuoteClick = () => {
@@ -241,6 +246,11 @@ function GalleryPostDetails({ id}: { id: PublicationId }) {
     if (result.isFailure()) {
       window.alert(result.error.message);
       return;
+    }
+
+    if(sessionData?.authenticated) {
+      const awardUniqueId = `${sessionData?.address}-${post.id}`; //the user will only receive points once per mirrored post
+      awardPoints(sessionData?.address, MIRROR_AWARD, 'Mirror', awardUniqueId);
     }
 
     window.alert("Mirrored successfully!");

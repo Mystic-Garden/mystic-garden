@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { useCreateQuote } from '@lens-protocol/react-web';
+import { useCreateQuote, useSession } from '@lens-protocol/react-web';
 import { textOnly } from "@lens-protocol/metadata";
-import { uploadData } from '@/lib/utils';
+import { awardPoints, isVerifiedProfile, uploadData } from '@/lib/utils';
 import { Textarea } from './ui/textarea';
+import { MIRROR_AWARD } from '@/app/constants';
+
 
 //todo: verificar session pra desabilitar o botão
 
@@ -11,6 +13,7 @@ function QuoteModal({ isOpen, onClose, postId }) {
   const [quoteText, setQuoteText] = useState('');
   const { execute: createQuote } = useCreateQuote();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { data: sessionData } = useSession();
 
   const handleQuoteSubmit = async () => {
     if (!quoteText.trim()) return;
@@ -38,9 +41,15 @@ function QuoteModal({ isOpen, onClose, postId }) {
     if (result.isFailure()) {
       alert(result.error.message);
     } else {
+
+      if(sessionData?.authenticated) {
+        const awardUniqueId = `${sessionData?.address}-${postId}`; //the user will only receive points once per mirrored post
+        awardPoints(sessionData?.address, MIRROR_AWARD, 'Mirror', awardUniqueId);
+      }
+      
       alert("Quote created successfully!");
       setQuoteText(''); 
-      onClose(); // Close modal
+      onClose(); 
     }
   };
 

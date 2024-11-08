@@ -181,7 +181,7 @@ const MintArt = () => {
           <Label htmlFor="description">Description</Label>
           <Textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Describe your NFT" rows={4} />
         </div>
-        {/* Checkbox to add a link in the description */}
+        {/* Checkbox to add a link in the description 
         <div>
           <label className="inline-flex items-center">
             <input
@@ -189,9 +189,9 @@ const MintArt = () => {
               checked={addLinkInDescription}
               onChange={() => setAddLinkInDescription(!addLinkInDescription)}
             />
-            <Label className="ml-2 my-2">Add a link to the auction in the description</Label>
+            <Label className="ml-2 my-2">Add a link to the art in the description</Label>
           </label>
-        </div>
+        </div>*/}
       </div>
 
       {selectedMintType === 'regular' ? (
