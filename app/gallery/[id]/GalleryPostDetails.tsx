@@ -221,12 +221,14 @@ function GalleryPostDetails({ id}: { id: PublicationId }) {
   const sellType = getPostSellType(post);
 
   const handleLike = async () => {
+    const isUpvote = !post.operations.hasUpvoted;
+
     const result = await toggle({
       reaction: PublicationReactionType.Upvote,
       publication: post,
     });
 
-    if(result.isSuccess() && sessionData?.authenticated) {
+    if(result.isSuccess() && sessionData?.authenticated && isUpvote) {
       const awardUniqueId = `${sessionData?.address}-${post.id}`; //the user will only receive points once per liked post
       awardPoints(sessionData?.address, LIKE_AWARD, 'Like', awardUniqueId);
     }
