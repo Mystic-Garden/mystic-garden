@@ -65,13 +65,13 @@ export function Nav() {
 
   return (
     <>
-      {/* Donation Callout */}
+      {/* Donation Callout 
       <div className="w-full bg-purple-900 text-white text-center p-2 fixed top-0 z-50">
         Support our magical space! <a href="https://explorer.gitcoin.co/#/round/42161/608/123" target="_blank" rel="noopener noreferrer" className="underline">Donate on Gitcoin</a>
       </div>
-
+     >>> change the top-0 to top-10 from the section bellow when using the message above  */}
       {/* Navigation Bar */}
-      <nav className="w-full fixed top-10 left-0 z-40 shadow-md bg-white/80 dark:bg-neutral-950/70">
+      <nav className="w-full fixed top-0 left-0 z-40 shadow-md bg-white/80 dark:bg-neutral-950/70">
         <div className="container flex flex-col md:flex-row items-center justify-between py-3">
           <div className="flex items-center justify-between w-full md:w-auto">
             <div className="flex items-center gap-6 text-sm">
