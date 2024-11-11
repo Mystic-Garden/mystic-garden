@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useCreateQuote, useSession } from '@lens-protocol/react-web';
 import { textOnly } from "@lens-protocol/metadata";
 import { awardPoints, isVerifiedProfile, uploadData } from '@/lib/utils';
 import { Textarea } from './ui/textarea';
 import { MIRROR_AWARD } from '@/app/constants';
-
 
 //todo: verificar session pra desabilitar o botão
 
@@ -14,6 +13,24 @@ function QuoteModal({ isOpen, onClose, postId }) {
   const { execute: createQuote } = useCreateQuote();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { data: sessionData } = useSession();
+  const [includeUrl, setIncludeUrl] = useState(false); 
+
+  useEffect(() => {
+    if (isOpen) {
+      setQuoteText('');
+      setIncludeUrl(false); 
+    }
+  }, [isOpen]);
+
+  const handleCheckboxChange = () => {
+    setIncludeUrl(!includeUrl);
+
+    if (!includeUrl) {
+      setQuoteText((prev) => `${prev}${prev ? '\n' : ''}Collect at ${window.location.href}`);
+    } else {
+      setQuoteText((prev) => prev.replace(`\nCollect at ${window.location.href}`, '').trim());
+    }
+  };
 
   const handleQuoteSubmit = async () => {
     if (!quoteText.trim()) return;
@@ -57,13 +74,25 @@ function QuoteModal({ isOpen, onClose, postId }) {
 
   return (
     <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
-      <div className="bg-white dark:bg-black p-6 rounded-lg shadow-lg w-80">
+      <div className="bg-white dark:bg-black p-6 rounded-lg shadow-lg min-w-96">
         <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Create Quote Post</h2>
         <Textarea
           value={quoteText}
           onChange={(e) => setQuoteText(e.target.value)}
           placeholder="Write your message..."
+          className="min-h-64"
         />
+        <div className="flex items-center mt-2">
+          <input
+            type="checkbox"
+            checked={includeUrl}
+            onChange={handleCheckboxChange}
+            className="mr-2"
+          />
+          <label className="text-xs text-gray-700 dark:text-gray-300">
+            Include "Collect at" in message
+          </label>
+          </div>
         <div className="flex justify-end gap-2 mt-4">
           <Button onClick={onClose} variant="secondary">
             Cancel
