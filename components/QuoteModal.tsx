@@ -90,7 +90,7 @@ function QuoteModal({ isOpen, onClose, postId }) {
             className="mr-2"
           />
           <label className="text-xs text-gray-700 dark:text-gray-300">
-            Include "Collect at" in message
+            Include the URL in the quote.
           </label>
           </div>
         <div className="flex justify-end gap-2 mt-4">
